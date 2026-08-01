@@ -47,22 +47,24 @@ class STTEngine {
     // Pares comunes de confusión acústica de vocales (Short Vowel Confusion Pairs)
     // En inglés americano, la 'E' corta (pen) y la 'A' o 'I' corta (pan/pin) suenan idénticas a los motores STT.
     this.commonVowelConfusions = {
-      'pen': ['pan', 'pin', 'pain', 'peen'],
-      'pet': ['pat', 'pit', 'pete'],
-      'bed': ['bad', 'bid'],
-      'men': ['man', 'min'],
-      'red': ['rad', 'read'],
-      'ten': ['tan', 'tin'],
-      'leg': ['lag', 'lig'],
-      'net': ['nat', 'nit'],
+      'pen': ['pan', 'pin', 'pain', 'peen', 'pend'],
+      'pet': ['pat', 'pit', 'pete', 'peg', 'pack', 'ped'],
+      'pig': ['peg', 'puk', 'pet', 'pit', 'pick', 'pack', 'piggy', 'pigs', 'peak'],
+      'pin': ['pen', 'pan', 'ping', 'pink'],
+      'pot': ['pat', 'pet', 'put', 'pod', 'pop'],
+      'bed': ['bad', 'bid', 'bet'],
+      'men': ['man', 'min', 'may'],
+      'red': ['rad', 'read', 'rat'],
+      'ten': ['tan', 'tin', 'ton'],
+      'leg': ['lag', 'lig', 'let'],
+      'net': ['nat', 'nit', 'not'],
       'vet': ['vat', 'vit'],
       'wet': ['wat', 'wit'],
       'hen': ['han', 'hin'],
       'hat': ['hut', 'hot'],
       'cap': ['cup', 'cop'],
-      'pig': ['peg', 'puk'],
-      'bag': ['bug', 'beg'],
-      'cat': ['cut', 'cot'],
+      'bag': ['bug', 'beg', 'back'],
+      'cat': ['cut', 'cot', 'cap'],
       'rat': ['rut', 'rot'],
       'sad': ['sid', 'sod']
     };
@@ -128,36 +130,37 @@ class STTEngine {
     for (let t of allTranscripts) {
       const spokenClean = t.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-      // 1. Coincidencia directa (ej: "pen" === "pen")
+      // 1. Coincidencia directa (ej: "pig" === "pig")
       if (spokenClean === cleanTarget) {
         return { match: true, score: 100 };
       }
 
-      // 2. Coincidencia por Tolerancia Fonética de Vocales (ej: Target "pen", STT escuchó "pan")
+      // 2. Coincidencia por Tolerancia Fonética de Vocales (ej: Target "pig", STT escuchó "pet" o "peg")
       if (knownConfusions.includes(spokenClean)) {
-        return { match: true, score: 95, note: "Ajuste acústico de vocal superado" };
+        return { match: true, score: 95, note: "Ajuste acústico superado" };
       }
 
-      // 3. Tolerancia por substitución de 1 sola vocal (si difieren únicamente en 1 vocal corta E/A/I)
-      if (spokenClean.length === cleanTarget.length && cleanTarget.length >= 3) {
+      // 3. Tolerancia por substitución de 1-2 consonantes/vocales en palabras cortas (CVC)
+      if (Math.abs(spokenClean.length - cleanTarget.length) <= 1 && cleanTarget.length >= 3) {
         let diffCount = 0;
-        let diffIsVowel = false;
+        let diffIsVowelOrPlosive = false;
 
-        for (let i = 0; i < cleanTarget.length; i++) {
-          if (spokenClean[i] !== cleanTarget[i]) {
-            diffCount++;
-            if (/[aeiou]/.test(spokenClean[i]) && /[aeiou]/.test(cleanTarget[i])) {
-              diffIsVowel = true;
+        if (spokenClean.length === cleanTarget.length) {
+          for (let i = 0; i < cleanTarget.length; i++) {
+            if (spokenClean[i] !== cleanTarget[i]) {
+              diffCount++;
+              if (/[aeiou]/.test(spokenClean[i]) || /[gtpkbd]/.test(spokenClean[i])) {
+                diffIsVowelOrPlosive = true;
+              }
             }
           }
-        }
-
-        if (diffCount === 1 && diffIsVowel) {
-          return { match: true, score: 90, note: "Tolerancia de vocal corta aplicada" };
+          if (diffCount === 1 || (diffCount === 2 && diffIsVowelOrPlosive && cleanTarget.length <= 4)) {
+            return { match: true, score: 90, note: "Tolerancia de pronunciación CVC aplicada" };
+          }
         }
       }
 
-      // 4. Coincidencia por conversión fonética de letras (ej: "P - E - N" -> p-e-n)
+      // 4. Coincidencia por conversión fonética de letras (ej: "P - I - G" -> p-i-g)
       const tokens = t.toLowerCase().split(/[\s\-]+/);
       let convertedLetters = '';
       tokens.forEach(tok => {

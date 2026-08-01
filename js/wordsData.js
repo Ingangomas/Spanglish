@@ -33,7 +33,7 @@ const WORDS_DATA = [
     level: 1,
     phonetic: "pig",
     spanish: "Cerdo / Cerdito",
-    synonyms: ["piglet", "hogly", "puerquito"],
+    synonyms: ["piglet", "piggy", "puerquito"],
     howToUseEs: "Usa 'pig' para referirte a este amigable animal de granja que dice 'oink oink'.",
     exampleEn: "The pink pig likes mud.",
     exampleEs: "Al cerdo rosado le gusta el lodo."

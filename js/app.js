@@ -40,6 +40,7 @@ class AppController {
 
     this.btnMicListen = document.getElementById('btn-mic-listen');
     this.voiceStatus = document.getElementById('voice-status');
+    this.voiceStatusMsg = document.getElementById('voice-status-msg');
     this.voiceHint = document.getElementById('voice-hint');
 
     this.renderKeyboard();
@@ -225,6 +226,10 @@ class AppController {
     
     this.renderLevelGrid();
     
+    if (this.filteredWords.length > 0) {
+      this.loadWord(this.filteredWords[0]);
+    }
+
     if (this.studyMode === 'grid') {
       this.showGridView();
     } else {
@@ -291,7 +296,12 @@ class AppController {
     document.getElementById('sentence-full-feedback').textContent = '';
 
     const spelledSpaced = wordObj.word.toUpperCase().split('').join(' - ');
-    this.voiceHint.textContent = `"${spelledSpaced}"`;
+    if (this.voiceHint) {
+      this.voiceHint.textContent = `"${spelledSpaced}"`;
+    }
+    if (this.voiceStatusMsg) {
+      this.voiceStatusMsg.textContent = "Haz clic en el micrófono y di la palabra en inglés o deletrea:";
+    }
 
     this.renderSlots();
     this.setMascot(`¡Estudiemos '${wordObj.word.toUpperCase()}'! Primero mira el significado arriba y luego deletréala.`);
@@ -429,18 +439,19 @@ class AppController {
   }
 
   toggleVoiceRecognition() {
+    const targetWord = this.currentWordObj ? this.currentWordObj.word.toUpperCase() : '';
     if (this.btnMicListen.classList.contains('listening')) {
       stt.stopListening();
       this.btnMicListen.classList.remove('listening');
-      this.voiceStatus.textContent = "Micrófono detenido.";
+      if (this.voiceStatusMsg) this.voiceStatusMsg.textContent = "Micrófono detenido.";
     } else {
       this.btnMicListen.classList.add('listening');
-      this.voiceStatus.textContent = "🎤 Escuchando... Habla la palabra en inglés o deletréala en inglés/español.";
+      if (this.voiceStatusMsg) this.voiceStatusMsg.textContent = "🎤 Escuchando... Habla la palabra en inglés o deletréala en inglés/español:";
 
       stt.startListening(
         (primaryTranscript, alternatives) => {
           this.btnMicListen.classList.remove('listening');
-          this.voiceStatus.innerHTML = `Escuchamos: <strong>"${primaryTranscript}"</strong>`;
+          if (this.voiceStatusMsg) this.voiceStatusMsg.innerHTML = `Escuchamos: <strong>"${primaryTranscript}"</strong>. Guía:`;
           
           const result = stt.evaluateMatch(primaryTranscript, this.currentWordObj.word, alternatives);
           if (result.match) {
@@ -448,12 +459,12 @@ class AppController {
             this.renderSlots();
             this.checkSpelling();
           } else {
-            this.setMascot(`Escuché "${primaryTranscript}". ¡Intenta hablar más cerca del micrófono o deletrear letra por letra!`);
+            this.setMascot(`Escuché "${primaryTranscript}". La palabra a deletrear es '${targetWord}'. ¡Intenta deletrearla letra por letra o usa el teclado!`);
           }
         },
         (errorMsg) => {
           this.btnMicListen.classList.remove('listening');
-          this.voiceStatus.textContent = errorMsg;
+          if (this.voiceStatusMsg) this.voiceStatusMsg.textContent = errorMsg;
         },
         () => {
           this.btnMicListen.classList.remove('listening');
