@@ -459,7 +459,7 @@ body {
 /* Encabezado de Palabra */
 .word-display-section {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .word-badge-level {
@@ -526,12 +526,80 @@ body {
   font-weight: 600;
 }
 
+/* BANNER DESTACADO DE SIGNIFICADO EN ESPAÑOL (ARRIBA) */
+.spanish-meaning-top-banner {
+  background: #FFFBEB;
+  border: 2px solid #FDE68A;
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(253, 230, 138, 0.3);
+}
+
+.meaning-header {
+  margin-bottom: 10px;
+}
+
+.meaning-header .m-badge {
+  font-size: 0.85rem;
+  background: var(--primary-orange);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 800;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+.meaning-text {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #92400E;
+}
+
+.how-to-use-box {
+  background: white;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 10px;
+  border-left: 4px solid var(--primary-amber);
+}
+
+.box-title {
+  font-weight: 700;
+  color: var(--deep-navy);
+  margin-bottom: 4px;
+}
+
+.how-to-use-text {
+  font-size: 1rem;
+  color: #475569;
+  line-height: 1.4;
+}
+
+/* Bloque de Deletreo */
+.spelling-section-block {
+  background: #F8FAFC;
+  border: 2px solid #E2E8F0;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
+}
+
+.block-label {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--deep-navy);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
 /* Slots de Deletreo */
 .spelling-slots-container {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin: 28px 0;
+  margin: 16px 0 24px 0;
   flex-wrap: wrap;
 }
 
@@ -546,7 +614,7 @@ body {
   font-size: 2rem;
   font-weight: 800;
   color: var(--deep-navy);
-  background: #F8FAFC;
+  background: white;
   transition: all 0.2s;
 }
 
@@ -578,11 +646,12 @@ body {
 
 /* Micrófono */
 .voice-practice-box {
-  background: #F1F5F9;
+  background: white;
+  border: 2px solid #CBD5E1;
   border-radius: var(--radius-md);
   padding: 18px;
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .btn-mic {
@@ -621,11 +690,10 @@ body {
 
 /* Teclado táctil */
 .on-screen-keyboard {
-  background: #F8FAFC;
+  background: white;
   border: 2px solid #E2E8F0;
   padding: 20px;
   border-radius: var(--radius-md);
-  margin-bottom: 32px;
 }
 
 .keyboard-row {
@@ -637,7 +705,7 @@ body {
 }
 
 .key-btn {
-  background: white;
+  background: #F8FAFC;
   border: 2px solid #CBD5E1;
   border-bottom: 4px solid #94A3B8;
   border-radius: 12px;
@@ -689,7 +757,7 @@ body {
   border: 2px solid #BAE6FD;
   border-radius: var(--radius-md);
   padding: 24px;
-  margin-bottom: 24px;
+  margin-top: 24px;
 }
 
 .writing-section-title {
@@ -783,82 +851,6 @@ body {
   margin-top: 10px;
   font-weight: 700;
   font-size: 1rem;
-}
-
-/* Acordeón de Detalles */
-.word-details-accordion {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.accordion-item {
-  border: 2px solid #E2E8F0;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.accordion-item.highlight {
-  border-color: #FDE68A;
-  background: #FFFBEB;
-}
-
-.accordion-header {
-  background: #F8FAFC;
-  padding: 14px 20px;
-  font-weight: 700;
-  font-size: 1.05rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--deep-navy);
-}
-
-.accordion-item.highlight .accordion-header {
-  background: #FEF3C7;
-  color: #92400E;
-}
-
-.accordion-body {
-  padding: 18px 20px;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.synonym-tag {
-  display: inline-block;
-  background: #E0F2FE;
-  color: var(--ocean-blue);
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-weight: 600;
-  margin-right: 6px;
-}
-
-.how-to-use-text {
-  font-size: 1.05rem;
-  color: #334155;
-  margin-bottom: 12px;
-}
-
-.example-box {
-  background: white;
-  border-left: 4px solid var(--primary-orange);
-  padding: 14px 18px;
-  border-radius: 0 12px 12px 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-
-.example-en {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--deep-navy);
-  margin-bottom: 4px;
-}
-
-.example-es {
-  font-size: 0.95rem;
-  color: #64748B;
 }
 
 /* Modo Concurso Real */

@@ -1,5 +1,5 @@
-// Módulo de Reconocimiento de Voz (Speech-to-Text)
-// Permite escuchar la pronunciación o deletreo del niño y evaluarla.
+// Módulo de Reconocimiento de Voz Inteligente Infantil (STT Dual Engine)
+// Optimizado para escuchar deletreo por letra o palabra completa tanto en Inglés como en Español.
 
 class STTEngine {
   constructor() {
@@ -8,10 +8,63 @@ class STTEngine {
       this.recognition = new SpeechRecognition();
       this.recognition.continuous = false;
       this.recognition.interimResults = false;
-      this.recognition.lang = 'en-US'; // Escuchar en inglés
+      this.recognition.maxAlternatives = 3; // Capturar múltiples alternativas para mayor precisión
+      this.recognition.lang = 'en-US';
     } else {
       this.recognition = null;
     }
+
+    // Mapa fonético de letras habladas por un niño de 7 años (en Inglés y Español)
+    this.phoneticLetterMap = {
+      // Fonética en Inglés
+      'ay': 'a', 'ei': 'a', 'hey': 'a',
+      'bee': 'b', 'be': 'b', 'bi': 'b',
+      'cee': 'c', 'see': 'c', 'si': 'c',
+      'dee': 'd', 'di': 'd',
+      'ee': 'e', 'eh': 'e',
+      'ef': 'f', 'eff': 'f',
+      'gee': 'g', 'ji': 'g',
+      'aitch': 'h', 'eich': 'h',
+      'eye': 'i', 'ai': 'i',
+      'jay': 'j', 'jey': 'j',
+      'kay': 'k', 'key': 'k',
+      'el': 'l', 'ell': 'l',
+      : 'm', 'emm': 'm',
+      'en': 'n', 'enn': 'n',
+      'oh': 'o', 'ou': 'o',
+      'pee': 'p', 'pi': 'p',
+      'cue': 'q', 'kiu': 'q',
+      'ar': 'r', 'are': 'r',
+      'ess': 's', 'es': 's',
+      'tee': 't', 'ti': 't',
+      'you': 'u', 'iu': 'u',
+      'vee': 'v', 'vi': 'v',
+      'double you': 'w', 'doble u': 'w',
+      'ex': 'x', 'eks': 'x',
+      'why': 'y', 'wai': 'y',
+      'zee': 'z', 'zed': 'z', 'zi': 'z',
+
+      // Fonética en Español (para niños hispanohablantes deletreando)
+      'a': 'a',
+      'ce': 'c',
+      'de': 'd',
+      'efe': 'f',
+      'ge': 'g',
+      'hache': 'h',
+      'jota': 'j',
+      'ka': 'k',
+      'ele': 'l',
+      'eme': 'm',
+      'ene': 'n',
+      'pe': 'p',
+      'cu': 'q',
+      'erre': 'r',
+      'te': 't',
+      'uve': 'v',
+      'equis': 'x',
+      'ye': 'y',
+      'zeta': 'z'
+    };
   }
 
   isSupported() {
@@ -20,18 +73,29 @@ class STTEngine {
 
   startListening(onResultCallback, onErrorCallback, onEndCallback) {
     if (!this.isSupported()) {
-      if (onErrorCallback) onErrorCallback("El navegador no soporta reconocimiento de voz. Usa Chrome o Edge.");
+      if (onErrorCallback) onErrorCallback("El micrófono requiere Google Chrome o Microsoft Edge.");
       return;
     }
 
     this.recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript.toLowerCase().trim();
-      const confidence = event.results[0][0].confidence;
-      if (onResultCallback) onResultCallback(transcript, confidence);
+      // Recopilar todas las alternativas posibles reconocidas
+      const alternatives = [];
+      for (let i = 0; i < event.results[0].length; i++) {
+        alternatives.push(event.results[0][i].transcript.toLowerCase().trim());
+      }
+      const primaryTranscript = alternatives[0];
+
+      if (onResultCallback) onResultCallback(primaryTranscript, alternatives);
     };
 
     this.recognition.onerror = (event) => {
-      if (onErrorCallback) onErrorCallback(`Error de micrófono: ${event.error}`);
+      if (event.error === 'no-speech') {
+        if (onErrorCallback) onErrorCallback("No escuchamos nada. ¡Intenta hablar más cerca del micrófono!");
+      } else if (event.error === 'not-allowed') {
+        if (onErrorCallback) onErrorCallback("Por favor permite el acceso al micrófono en el navegador.");
+      } else {
+        if (onErrorCallback) onErrorCallback(`Micrófono: ${event.error}`);
+      }
     };
 
     this.recognition.onend = () => {
@@ -41,7 +105,7 @@ class STTEngine {
     try {
       this.recognition.start();
     } catch (e) {
-      if (onErrorCallback) onErrorCallback("El micrófono ya está activo o fue bloqueado.");
+      if (onErrorCallback) onErrorCallback("El micrófono ya está activo.");
     }
   }
 
@@ -51,23 +115,47 @@ class STTEngine {
     }
   }
 
-  // Normalizador para comparar lo que dijo el niño con la palabra/letras esperadas
-  evaluateMatch(spokenText, targetWord) {
+  // Evaluador Fonético Robusto para Niños
+  evaluateMatch(transcript, targetWord, alternatives = []) {
     const target = targetWord.toLowerCase().trim();
-    const spoken = spokenText.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
     const cleanTarget = target.replace(/[^a-z0-9]/g, '');
 
-    // Coincidencia exacta
-    if (spoken === cleanTarget) return { match: true, score: 100 };
+    // Comprobar todas las alternativas entregadas por el reconocedor
+    const allTranscripts = [transcript, ...alternatives];
 
-    // Deletreo hablado (ej: "a p p l e" o "a-p-p-l-e")
-    const spokenLetters = spokenText.toLowerCase().split(/[\s\-]+/).join('');
-    if (spokenLetters === cleanTarget) return { match: true, score: 100 };
+    for (let t of allTranscripts) {
+      const spokenClean = t.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    // Similitud de Levenshtein para pequeñas imprecisiones infantiles
-    const distance = this.levenshteinDistance(spoken, cleanTarget);
-    if (distance <= 1 && cleanTarget.length >= 4) {
-      return { match: true, score: 85, note: "¡Casi perfecto! Muy buena pronunciación." };
+      // 1. Coincidencia directa de la palabra pronunciada (ej: "pen" === "pen")
+      if (spokenClean === cleanTarget) {
+        return { match: true, score: 100 };
+      }
+
+      // 2. Coincidencia por conversión fonética de letras individuales
+      const tokens = t.toLowerCase().split(/[\s\-]+/);
+      let convertedLetters = '';
+      tokens.forEach(tok => {
+        if (this.phoneticLetterMap[tok]) {
+          convertedLetters += this.phoneticLetterMap[tok];
+        } else if (tok.length === 1 && /[a-z]/.test(tok)) {
+          convertedLetters += tok;
+        }
+      });
+
+      if (convertedLetters === cleanTarget) {
+        return { match: true, score: 100 };
+      }
+
+      // 3. Similitud aproximada si el niño omitió solo 1 letra o tuvo pequeña imprecisión
+      if (cleanTarget.length >= 3) {
+        const distWord = this.levenshteinDistance(spokenClean, cleanTarget);
+        if (distWord <= 1) return { match: true, score: 90 };
+
+        if (convertedLetters.length > 0) {
+          const distLetters = this.levenshteinDistance(convertedLetters, cleanTarget);
+          if (distLetters <= 1) return { match: true, score: 90 };
+        }
+      }
     }
 
     return { match: false, score: 0 };

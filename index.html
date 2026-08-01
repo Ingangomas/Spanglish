@@ -73,7 +73,7 @@
   <!-- ================= CONTENEDOR PRINCIPAL ================= -->
   <main class="app-main">
 
-    <!-- PESTAÑA 1: ESTUDIO Y DELETREO INTERACTIVO CON ESCRITURA ACTIVA -->
+    <!-- PESTAÑA 1: ESTUDIO Y DELETREO INTERACTIVO -->
     <section id="tab-spelling" class="tab-content active">
       
       <!-- Selector de Niveles (1 a 5 con desbloqueo al 80%) -->
@@ -103,14 +103,14 @@
       <div id="level-words-grid-view" class="level-grid-view">
         <div class="level-grid-header">
           <h3 id="level-grid-title">Palabras del Nivel 1</h3>
-          <p id="level-grid-subtitle">Toca cualquier palabra para estudiarla, deletrearla y escribir su sinónimo y oración:</p>
+          <p id="level-grid-subtitle">Toca cualquier palabra para ver su significado en español y practicar su deletreo y oraciones:</p>
         </div>
         <div class="level-words-cards-container" id="level-words-container">
           <!-- Tarjetas de palabras del nivel -->
         </div>
       </div>
 
-      <!-- VISTA B: Tarjeta Principal de Estudio, Deletreo y Escritura Activa -->
+      <!-- VISTA B: Tarjeta Principal de Estudio y Deletreo (Ordenamiento Didáctico Perfeccionado) -->
       <div id="single-word-practice-view" class="word-practice-card">
         
         <div class="card-top-nav">
@@ -122,11 +122,11 @@
         <div class="mascot-speech-bubble">
           <div class="mascot-avatar">🐝</div>
           <div class="speech-text" id="mascot-text">
-            ¡Hola Campeón! Recuerda: **"¡Lo que se escribe se aprende mejor!"** Deletrea la palabra y completa las tareas de escritura abajo.
+            ¡Hola Campeón! Lee el **significado en español arriba**, deletréala y luego escribe el sinónimo y la oración.
           </div>
         </div>
 
-        <!-- Encabezado de la Palabra -->
+        <!-- 1. ENCABEZADO DE LA PALABRA -->
         <div class="word-display-section">
           <div class="word-badge-level" id="card-level-badge">Nivel 1</div>
           
@@ -147,37 +147,56 @@
           <div class="phonetic-tag" id="card-phonetic">Pronunciación: /pen/</div>
         </div>
 
-        <!-- Ranuras de Deletreo de la Palabra -->
-        <div class="spelling-slots-container" id="spelling-slots">
-          <!-- Se generan dinámicamente cuadros para cada letra -->
-        </div>
+        <!-- 2. SIGNIFICADO EN ESPAÑOL Y USO EN LA VIDA REAL (AHORA UBICADO PRIMERO Y DESTACADO) -->
+        <div class="spanish-meaning-top-banner">
+          <div class="meaning-header">
+            <span class="m-badge">📖 Significado en Español</span>
+            <h3 id="card-spanish-meaning" class="meaning-text">Pluma / Bolígrafo</h3>
+          </div>
 
-        <!-- Reconocimiento de Voz / Micrófono -->
-        <div class="voice-practice-box">
-          <button id="btn-mic-listen" class="btn-mic">
-            <i class="fa-solid fa-microphone"></i>
-            <span>Presionar y Hablar (Deletrear o Pronunciar)</span>
-          </button>
-          <div id="voice-status" class="voice-status-text">
-            Haz clic en el micrófono y di: <strong id="voice-hint">"P - E - N"</strong> o la palabra completa.
+          <div class="how-to-use-box">
+            <div class="box-title"><i class="fa-solid fa-lightbulb"></i> ¿Cómo usar esta palabra en la vida real?</div>
+            <p id="card-how-to-use" class="how-to-use-text">
+              Usa 'pen' cuando vayas a escribir o dibujar con tinta. Para hacer una oración en inglés, combina con 'I have a...' (Yo tengo un...) o 'This is a...' (Este es un...).
+            </p>
           </div>
         </div>
 
-        <!-- Teclado en Pantalla con Sonido -->
-        <div class="on-screen-keyboard">
-          <div class="keyboard-row" id="keyboard-letters">
-            <!-- Teclas A-Z generadas dinámicamente -->
+        <!-- 3. RANURAS DE DELETREO Y TECLADO -->
+        <div class="spelling-section-block">
+          <div class="block-label">🔤 Deletrea la palabra letra por letra:</div>
+
+          <div class="spelling-slots-container" id="spelling-slots">
+            <!-- Se generan dinámicamente cuadros para cada letra -->
           </div>
-          <div class="keyboard-actions">
-            <button id="btn-key-backspace" class="btn-key-action"><i class="fa-solid fa-backspace"></i> Borrar</button>
-            <button id="btn-key-check" class="btn-key-action check"><i class="fa-solid fa-circle-check"></i> Comprobar Deletreo</button>
-            <button id="btn-next-word" class="btn-key-action next"><i class="fa-solid fa-arrow-right"></i> Siguiente Palabra ➡️</button>
+
+          <!-- Reconocimiento de Voz Inteligente Dual (Español + Inglés + Fonética de Letras) -->
+          <div class="voice-practice-box">
+            <button id="btn-mic-listen" class="btn-mic">
+              <i class="fa-solid fa-microphone"></i>
+              <span>Presionar y Hablar (Deletrear o Pronunciar)</span>
+            </button>
+            <div id="voice-status" class="voice-status-text">
+              Haz clic en el micrófono y di la palabra en inglés o deletrea: <strong id="voice-hint">"P - E - N"</strong>
+            </div>
+          </div>
+
+          <!-- Teclado en Pantalla con Sonido -->
+          <div class="on-screen-keyboard">
+            <div class="keyboard-row" id="keyboard-letters">
+              <!-- Teclas A-Z generadas dinámicamente -->
+            </div>
+            <div class="keyboard-actions">
+              <button id="btn-key-backspace" class="btn-key-action"><i class="fa-solid fa-backspace"></i> Borrar</button>
+              <button id="btn-key-check" class="btn-key-action check"><i class="fa-solid fa-circle-check"></i> Comprobar Deletreo</button>
+              <button id="btn-next-word" class="btn-key-action next"><i class="fa-solid fa-arrow-right"></i> Siguiente Palabra ➡️</button>
+            </div>
           </div>
         </div>
 
-        <!-- ================= MÓDULO DE ESCRITURA ACTIVA (SINÓNIMOS Y ORACIONES) ================= -->
+        <!-- 4. TALLER DE ESCRITURA ACTIVA (SINÓNIMOS Y ORACIONES EN INGLÉS) -->
         <div class="active-writing-section">
-          <h3 class="writing-section-title"><i class="fa-solid fa-pen-nib"></i> Taller de Escritura Activa (Plus Spanglish ✍️)</h3>
+          <h3 class="writing-section-title"><i class="fa-solid fa-pen-nib"></i> Taller de Escritura Activa (Sinónimos y Oraciones ✍️)</h3>
 
           <!-- Desafío A: Escribir el Sinónimo -->
           <div class="writing-card-challenge">
@@ -209,31 +228,11 @@
             <button id="btn-check-full-sentence" class="btn-writing-check primary"><i class="fa-solid fa-check-double"></i> Comprobar mi Oración</button>
             <div id="sentence-full-feedback" class="writing-feedback"></div>
           </div>
-        </div>
 
-        <!-- Acordeón Educativo: Significado y Guía Didáctica -->
-        <div class="word-details-accordion" style="margin-top:24px;">
-          
-          <div class="accordion-item">
-            <div class="accordion-header"><i class="fa-solid fa-book"></i> Significado en Español</div>
-            <div class="accordion-body" id="card-spanish-meaning">
-              Pluma / Bolígrafo
-            </div>
+          <!-- Lista de Sinónimos Adicionales -->
+          <div style="margin-top:14px; font-size:0.9rem; color:#475569;">
+            <strong>Sinónimos equivalentes:</strong> <span id="card-synonyms"></span>
           </div>
-
-          <div class="accordion-item highlight">
-            <div class="accordion-header"><i class="fa-solid fa-lightbulb"></i> ¿Cómo crear oraciones y usarla en la vida real?</div>
-            <div class="accordion-body">
-              <p id="card-how-to-use" class="how-to-use-text">
-                Usa 'pen' cuando vayas a escribir o dibujar con tinta. Para hacer una oración en inglés, combina con 'I have a...' (Yo tengo un...) o 'This is a...' (Este es un...).
-              </p>
-              <div class="example-box">
-                <div class="example-en"><i class="fa-solid fa-quote-left"></i> <span id="card-example-en">I write with a blue pen.</span></div>
-                <div class="example-es" id="card-example-es">Escribo con una pluma azul.</div>
-              </div>
-            </div>
-          </div>
-
         </div>
 
       </div>

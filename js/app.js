@@ -102,7 +102,7 @@ class AppController {
       });
     });
 
-    // Modos de Aprendizaje (Ver todas las tarjetas vs Modo Sucesivo Continuo)
+    // Modos de Aprendizaje
     document.getElementById('btn-mode-grid').addEventListener('click', () => {
       this.studyMode = 'grid';
       document.getElementById('btn-mode-grid').classList.add('active');
@@ -117,7 +117,6 @@ class AppController {
       this.showSingleWordView(this.currentWordIndex);
     });
 
-    // Botón para volver a la cuadrícula de palabras
     document.getElementById('btn-back-to-grid').addEventListener('click', () => {
       this.showGridView();
     });
@@ -237,7 +236,6 @@ class AppController {
         <div class="w-title">${wordObj.word}</div>
         <div class="w-es">${wordObj.spanish}</div>
       `;
-      // Al hacer clic en CUALQUIER palabra de la lista, abre esa palabra específica para practicar!
       card.addEventListener('click', () => {
         this.showSingleWordView(idx);
       });
@@ -290,7 +288,7 @@ class AppController {
     this.voiceHint.textContent = `"${spelledSpaced}"`;
 
     this.renderSlots();
-    this.setMascot(`¡Estudiemos '${wordObj.word.toUpperCase()}'! Recuerda escribir también su sinónimo u oración.`);
+    this.setMascot(`¡Estudiemos '${wordObj.word.toUpperCase()}'! Primero mira el significado arriba y luego deletréala.`);
   }
 
   renderSlots() {
@@ -346,10 +344,9 @@ class AppController {
       this.renderLevelGrid();
       this.updateLevelButtons();
 
-      this.setMascot("🎉 ¡EXCELENTE! ¡Deletreo correcto! ¡Ahora intenta escribir su sinónimo u oración!");
+      this.setMascot("🎉 ¡EXCELENTE! ¡Deletreo correcto! ¡Ahora completa la escritura del sinónimo y la oración abajo!");
       tts.speakSpanish("¡Excelente! Deletreo perfecto en Spanglish.");
 
-      // Si está en modo sucesivo, pasar a la siguiente palabra automáticamente
       if (this.studyMode === 'sequential') {
         setTimeout(() => this.nextWord(), 2000);
       }
@@ -432,20 +429,20 @@ class AppController {
       this.voiceStatus.textContent = "Micrófono detenido.";
     } else {
       this.btnMicListen.classList.add('listening');
-      this.voiceStatus.textContent = "🎤 Escuchando en Spanglish... Di las letras en inglés o la palabra.";
+      this.voiceStatus.textContent = "🎤 Escuchando... Habla la palabra en inglés o deletréala en inglés/español.";
 
       stt.startListening(
-        (transcript) => {
+        (primaryTranscript, alternatives) => {
           this.btnMicListen.classList.remove('listening');
-          this.voiceStatus.innerHTML = `Escuchamos: <strong>"${transcript}"</strong>`;
+          this.voiceStatus.innerHTML = `Escuchamos: <strong>"${primaryTranscript}"</strong>`;
           
-          const result = stt.evaluateMatch(transcript, this.currentWordObj.word);
+          const result = stt.evaluateMatch(primaryTranscript, this.currentWordObj.word, alternatives);
           if (result.match) {
             this.enteredLetters = this.currentWordObj.word.toUpperCase().split('');
             this.renderSlots();
             this.checkSpelling();
           } else {
-            this.setMascot(`Te escuché decir "${transcript}". ¡Intenta deletrear letra por letra!`);
+            this.setMascot(`Escuché "${primaryTranscript}". ¡Intenta hablar más cerca del micrófono o deletrear letra por letra!`);
           }
         },
         (errorMsg) => {
