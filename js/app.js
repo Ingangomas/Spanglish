@@ -274,7 +274,7 @@ class AppController {
 
     // Configurar sección de Escritura Activa
     const mainSynonym = wordObj.synonyms[0] || "palabra equivalente";
-    document.getElementById('synonym-hint-prompt').innerHTML = `Sinónimo de <strong>${wordObj.word.toUpperCase()}</strong>:`;
+    document.getElementById('synonym-word-name').textContent = wordObj.word.toUpperCase();
     document.getElementById('synonym-target-hint').textContent = mainSynonym;
     document.getElementById('input-synonym-user').value = '';
     document.getElementById('synonym-feedback').textContent = '';
