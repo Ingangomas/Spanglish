@@ -138,6 +138,12 @@ class AppController {
       });
     });
 
+    document.getElementById('btn-read-meaning').addEventListener('click', () => {
+      if (!this.currentWordObj) return;
+      const textToRead = `${this.currentWordObj.spanish}. ${this.currentWordObj.howToUseEs}`;
+      tts.speakSpanish(textToRead);
+    });
+
     // Acciones del Teclado
     document.getElementById('btn-key-backspace').addEventListener('click', () => this.handleBackspace());
     document.getElementById('btn-key-check').addEventListener('click', () => this.checkSpelling());
