@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spanglish | Aprende Inglés Jugando & Spelling Bee 2026</title>
+  <!-- Google Fonts para tipografía infantil moderna -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Style Sheet -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- ================= HEADER PRINCIPAL ================= -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <span class="bee-logo">🐝</span>
+        <div>
+          <h1>Spanglish <span class="badge-year">Spelling Bee 2026</span></h1>
+          <p class="subtitle">Aprende Inglés Jugando • 220 Palabras de Primer Grado</p>
+        </div>
+      </div>
+
+      <!-- Barra de Estado / Gamificación -->
+      <div class="stats-bar">
+        <div class="stat-pill streak-pill" title="Días seguidos practicando">
+          <span class="stat-icon">🔥</span>
+          <span id="user-streak">1</span> d
+        </div>
+        <div class="stat-pill star-pill" title="Estrellas ganadas">
+          <span class="stat-icon">⭐</span>
+          <span id="user-stars">10</span>
+        </div>
+        <div class="stat-pill mastered-pill" title="Palabras dominadas">
+          <span class="stat-icon">🏆</span>
+          <span id="user-mastered-count">0</span> / 220
+        </div>
+        <button id="btn-parent-dashboard" class="btn-icon-label" title="Panel para Padres">
+          <i class="fa-solid fa-user-ninja"></i>
+          <span>Padres</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navegación de Pestañas -->
+    <nav class="main-nav">
+      <button class="nav-btn active" data-tab="tab-spelling">
+        <i class="fa-solid fa-spell-check"></i>
+        <span>Estudio y Deletreo</span>
+      </button>
+      <button class="nav-btn" data-tab="tab-blind-bee">
+        <i class="fa-solid fa-trophy"></i>
+        <span>Modo Concurso Real</span>
+      </button>
+      <button class="nav-btn" data-tab="tab-dictionary">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Diccionario (220 Palabras)</span>
+      </button>
+      <button class="nav-btn" data-tab="tab-sentences">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <span>Escribir Oraciones</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- ================= CONTENEDOR PRINCIPAL ================= -->
+  <main class="app-main">
+
+    <!-- PESTAÑA 1: ESTUDIO Y DELETREO INTERACTIVO CON ESCRITURA ACTIVA -->
+    <section id="tab-spelling" class="tab-content active">
+      
+      <!-- Selector de Niveles (1 a 5 con desbloqueo al 80%) -->
+      <div class="level-selector-bar">
+        <div class="selector-title">
+          <span class="selector-label"><i class="fa-solid fa-lock-open"></i> Niveles Sucesivos (Supera 80% para desbloquear):</span>
+        </div>
+        <div class="level-buttons" id="level-buttons-container">
+          <!-- Botones de nivel generados dinámicamente -->
+        </div>
+      </div>
+
+      <!-- Barra de Modo de Estudio: Ver Todas o Modo Sucesivo -->
+      <div class="study-mode-toggle-bar">
+        <span class="mode-label">Modo de Aprendizaje en este Nivel:</span>
+        <div class="mode-toggle-buttons">
+          <button id="btn-mode-grid" class="btn-mode-toggle active">
+            <i class="fa-solid fa-grid-2"></i> 📜 Ver Todas las Palabras
+          </button>
+          <button id="btn-mode-sequential" class="btn-mode-toggle">
+            <i class="fa-solid fa-forward-step"></i> ➡️ Modo Sucesivo (Continuo)
+          </button>
+        </div>
+      </div>
+
+      <!-- VISTA A: Cuadrícula de Selección de Palabras del Nivel -->
+      <div id="level-words-grid-view" class="level-grid-view">
+        <div class="level-grid-header">
+          <h3 id="level-grid-title">Palabras del Nivel 1</h3>
+          <p id="level-grid-subtitle">Toca cualquier palabra para estudiarla, deletrearla y escribir su sinónimo y oración:</p>
+        </div>
+        <div class="level-words-cards-container" id="level-words-container">
+          <!-- Tarjetas de palabras del nivel -->
+        </div>
+      </div>
+
+      <!-- VISTA B: Tarjeta Principal de Estudio, Deletreo y Escritura Activa -->
+      <div id="single-word-practice-view" class="word-practice-card">
+        
+        <div class="card-top-nav">
+          <button id="btn-back-to-grid" class="btn-back-link"><i class="fa-solid fa-arrow-left"></i> Volver a la Lista del Nivel</button>
+          <div class="sequence-indicator" id="sequence-indicator-text">Palabra 1 de 44</div>
+        </div>
+
+        <!-- Mascota Spanglish Bee -->
+        <div class="mascot-speech-bubble">
+          <div class="mascot-avatar">🐝</div>
+          <div class="speech-text" id="mascot-text">
+            ¡Hola Campeón! Recuerda: **"¡Lo que se escribe se aprende mejor!"** Deletrea la palabra y completa las tareas de escritura abajo.
+          </div>
+        </div>
+
+        <!-- Encabezado de la Palabra -->
+        <div class="word-display-section">
+          <div class="word-badge-level" id="card-level-badge">Nivel 1</div>
+          
+          <h2 id="card-english-word" class="target-word">PEN</h2>
+          
+          <div class="word-audio-controls">
+            <button id="btn-speak-normal" class="btn-audio" title="Escuchar pronunciación alegre">
+              <i class="fa-solid fa-volume-high"></i> Pronunciar
+            </button>
+            <button id="btn-speak-slow" class="btn-audio turtle" title="Escuchar lento (modo tortuga)">
+              <i class="fa-solid fa-turtle"></i> Lento
+            </button>
+            <button id="btn-spell-auto" class="btn-audio spell" title="Escuchar deletreo de la palabra">
+              <i class="fa-solid fa-font"></i> Deletrear Voz
+            </button>
+          </div>
+
+          <div class="phonetic-tag" id="card-phonetic">Pronunciación: /pen/</div>
+        </div>
+
+        <!-- Ranuras de Deletreo de la Palabra -->
+        <div class="spelling-slots-container" id="spelling-slots">
+          <!-- Se generan dinámicamente cuadros para cada letra -->
+        </div>
+
+        <!-- Reconocimiento de Voz / Micrófono -->
+        <div class="voice-practice-box">
+          <button id="btn-mic-listen" class="btn-mic">
+            <i class="fa-solid fa-microphone"></i>
+            <span>Presionar y Hablar (Deletrear o Pronunciar)</span>
+          </button>
+          <div id="voice-status" class="voice-status-text">
+            Haz clic en el micrófono y di: <strong id="voice-hint">"P - E - N"</strong> o la palabra completa.
+          </div>
+        </div>
+
+        <!-- Teclado en Pantalla con Sonido -->
+        <div class="on-screen-keyboard">
+          <div class="keyboard-row" id="keyboard-letters">
+            <!-- Teclas A-Z generadas dinámicamente -->
+          </div>
+          <div class="keyboard-actions">
+            <button id="btn-key-backspace" class="btn-key-action"><i class="fa-solid fa-backspace"></i> Borrar</button>
+            <button id="btn-key-check" class="btn-key-action check"><i class="fa-solid fa-circle-check"></i> Comprobar Deletreo</button>
+            <button id="btn-next-word" class="btn-key-action next"><i class="fa-solid fa-arrow-right"></i> Siguiente Palabra ➡️</button>
+          </div>
+        </div>
+
+        <!-- ================= MÓDULO DE ESCRITURA ACTIVA (SINÓNIMOS Y ORACIONES) ================= -->
+        <div class="active-writing-section">
+          <h3 class="writing-section-title"><i class="fa-solid fa-pen-nib"></i> Taller de Escritura Activa (Plus Spanglish ✍️)</h3>
+
+          <!-- Desafío A: Escribir el Sinónimo -->
+          <div class="writing-card-challenge">
+            <div class="challenge-header">
+              <span class="ch-badge">Paso 1</span>
+              <h4>Escribe un Sinónimo en Inglés:</h4>
+            </div>
+            <p class="ch-prompt" id="synonym-hint-prompt">Sinónimo de **PEN**: <strong id="synonym-target-hint">marker</strong></p>
+
+            <div class="writing-input-group">
+              <input type="text" id="input-synonym-user" placeholder="Escribe el sinónimo aquí..." autocomplete="off">
+              <button id="btn-check-synonym" class="btn-writing-check"><i class="fa-solid fa-pen"></i> Verificar Sinónimo</button>
+            </div>
+            <div id="synonym-feedback" class="writing-feedback"></div>
+          </div>
+
+          <!-- Desafío B: Escribir la Oración Completa -->
+          <div class="writing-card-challenge">
+            <div class="challenge-header">
+              <span class="ch-badge">Paso 2</span>
+              <h4>Escribe la Oración Completa en Inglés:</h4>
+            </div>
+            <p class="ch-prompt">Español: <em id="sentence-es-prompt">Escribo con una pluma azul.</em></p>
+            <div class="sentence-target-preview"><i class="fa-solid fa-eye"></i> Modelo: <strong id="sentence-en-target-display">I write with a blue pen.</strong></div>
+
+            <div class="writing-input-group full-width">
+              <textarea id="input-sentence-user" rows="2" placeholder="Escribe la oración completa en inglés aquí..."></textarea>
+            </div>
+            <button id="btn-check-full-sentence" class="btn-writing-check primary"><i class="fa-solid fa-check-double"></i> Comprobar mi Oración</button>
+            <div id="sentence-full-feedback" class="writing-feedback"></div>
+          </div>
+        </div>
+
+        <!-- Acordeón Educativo: Significado y Guía Didáctica -->
+        <div class="word-details-accordion" style="margin-top:24px;">
+          
+          <div class="accordion-item">
+            <div class="accordion-header"><i class="fa-solid fa-book"></i> Significado en Español</div>
+            <div class="accordion-body" id="card-spanish-meaning">
+              Pluma / Bolígrafo
+            </div>
+          </div>
+
+          <div class="accordion-item highlight">
+            <div class="accordion-header"><i class="fa-solid fa-lightbulb"></i> ¿Cómo crear oraciones y usarla en la vida real?</div>
+            <div class="accordion-body">
+              <p id="card-how-to-use" class="how-to-use-text">
+                Usa 'pen' cuando vayas a escribir o dibujar con tinta. Para hacer una oración en inglés, combina con 'I have a...' (Yo tengo un...) o 'This is a...' (Este es un...).
+              </p>
+              <div class="example-box">
+                <div class="example-en"><i class="fa-solid fa-quote-left"></i> <span id="card-example-en">I write with a blue pen.</span></div>
+                <div class="example-es" id="card-example-es">Escribo con una pluma azul.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PESTAÑA 2: MODO CONCURSO REAL (BLIND SPELLING BEE) -->
+    <section id="tab-blind-bee" class="tab-content">
+      <div class="blind-bee-card">
+        <div class="contest-header">
+          <span class="trophy-icon">🏆</span>
+          <h2>Simulador del Concurso Spelling Bee 2026</h2>
+          <p>Escucha la palabra y la definición en inglés nativo, ¡y deletréala sin verla escrita!</p>
+        </div>
+
+        <div class="contest-stage">
+          <button id="btn-contest-play-word" class="btn-contest-big">
+            <i class="fa-solid fa-volume-high"></i> Escuchar Palabra de Concurso
+          </button>
+          
+          <div class="contest-clue-box" id="contest-clue">
+            Haz clic en el botón superior para comenzar la ronda de concurso.
+          </div>
+
+          <div class="contest-input-box">
+            <input type="text" id="contest-user-input" placeholder="Escribe la palabra completa aquí..." autocomplete="off">
+            <button id="btn-contest-submit" class="btn-primary-action">Enviar Respuesta</button>
+          </div>
+
+          <div id="contest-feedback" class="contest-feedback-banner"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 3: DICCIONARIO COMPLETO (220 PALABRAS) -->
+    <section id="tab-dictionary" class="tab-content">
+      <div class="dictionary-header">
+        <h2>📚 Lista Oficial de 220 Palabras de Spanglish (Primer Grado)</h2>
+        <div class="search-filter-box">
+          <input type="text" id="dict-search-input" placeholder="Buscar palabra en inglés o español..." />
+          <select id="dict-level-filter">
+            <option value="all">Todos los Niveles (1-5)</option>
+            <option value="1">Nivel 1</option>
+            <option value="2">Nivel 2</option>
+            <option value="3">Nivel 3</option>
+            <option value="4">Nivel 4</option>
+            <option value="5">Nivel 5</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="words-grid" id="dictionary-grid">
+        <!-- Las 220 tarjetas de palabras se renderizan aquí dinámicamente -->
+      </div>
+    </section>
+
+    <!-- PESTAÑA 4: TALLER DEDICADO DE ESCRITURA DE ORACIONES -->
+    <section id="tab-sentences" class="tab-content">
+      <div class="sentences-builder-card">
+        <h2>✍️ Taller de Escritura Manual de Oraciones</h2>
+        <p>Lee el significado en español y <strong>escribe tú mismo la oración completa en inglés</strong> para reforzar la memoria:</p>
+
+        <div class="target-sentence-info">
+          <span class="label">Oración en Español:</span>
+          <h3 id="builder-spanish-target">Escribo con una pluma azul.</h3>
+        </div>
+
+        <div class="sentence-writing-practice-box">
+          <div class="example-en-hint">
+            <i class="fa-solid fa-key"></i> Modelo de Guía: <strong id="sentence-writing-model-en">I write with a blue pen.</strong>
+          </div>
+
+          <textarea id="standalone-sentence-textarea" rows="3" placeholder="Escribe aquí la oración completa en inglés..."></textarea>
+          
+          <div class="sentence-actions" style="margin-top:16px;">
+            <button id="btn-submit-written-sentence" class="btn-primary-action"><i class="fa-solid fa-paper-plane"></i> Comprobar mi Escritura</button>
+            <button id="btn-next-sentence-practice" class="btn-secondary-action">Siguiente Oración ➡️</button>
+          </div>
+
+          <div id="standalone-sentence-feedback" class="feedback-msg"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODAL PANEL DE PADRES ================= -->
+  <div id="modal-parent-dashboard" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close" id="btn-close-modal">&times;</button>
+      <div class="modal-header">
+        <h2>👨‍👩‍👦 Panel de Control Spanglish (Padres)</h2>
+        <p>Progreso por niveles y meta de 80% de aciertos para desbloqueo</p>
+      </div>
+      
+      <div class="dashboard-stats-grid">
+        <div class="dash-stat">
+          <span class="dash-num" id="dash-total-mastered">0</span>
+          <span class="dash-lbl">Palabras Dominadas</span>
+        </div>
+        <div class="dash-stat">
+          <span class="dash-num" id="dash-total-stars">10</span>
+          <span class="dash-lbl">Estrellas Acumuladas</span>
+        </div>
+        <div class="dash-stat">
+          <span class="dash-num" id="dash-streak">1</span>
+          <span class="dash-lbl">Días de Racha</span>
+        </div>
+      </div>
+
+      <div class="level-progress-list" id="parent-level-progress-list">
+        <!-- Barra de progreso por nivel 1 al 5 -->
+      </div>
+
+      <div class="parent-actions-list" style="margin-top:20px;">
+        <h3>Acciones Recomendadas:</h3>
+        <button id="btn-print-flashcards" class="btn-dash-action"><i class="fa-solid fa-print"></i> Imprimir Fichas de Repaso (Flashcards)</button>
+        <button id="btn-reset-data" class="btn-dash-action danger"><i class="fa-solid fa-rotate-left"></i> Reiniciar Progreso del Niño</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts de la Aplicación -->
+  <script src="js/wordsData.js"></script>
+  <script src="js/tts.js"></script>
+  <script src="js/stt.js"></script>
+  <script src="js/gamification.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
