@@ -8,7 +8,7 @@ class AppController {
     this.currentWordObj = null;
     this.enteredLetters = [];
 
-    // Modo de Estudio: 'grid' (ver todas) o 'sequential' (sucesivo automático)
+    // Modo de Estudio: 'grid' (ver todas las tarjetas) o 'sequential' (sucesivo continuo)
     this.studyMode = 'grid';
 
     // Modo Concurso
@@ -102,7 +102,7 @@ class AppController {
       });
     });
 
-    // Modos de Aprendizaje (Ver todas vs Modo Sucesivo)
+    // Modos de Aprendizaje (Ver todas las tarjetas vs Modo Sucesivo Continuo)
     document.getElementById('btn-mode-grid').addEventListener('click', () => {
       this.studyMode = 'grid';
       document.getElementById('btn-mode-grid').classList.add('active');
@@ -114,9 +114,10 @@ class AppController {
       this.studyMode = 'sequential';
       document.getElementById('btn-mode-sequential').classList.add('active');
       document.getElementById('btn-mode-grid').classList.remove('active');
-      this.showSingleWordView();
+      this.showSingleWordView(this.currentWordIndex);
     });
 
+    // Botón para volver a la cuadrícula de palabras
     document.getElementById('btn-back-to-grid').addEventListener('click', () => {
       this.showGridView();
     });
@@ -162,7 +163,7 @@ class AppController {
     // Micrófono
     this.btnMicListen.addEventListener('click', () => this.toggleVoiceRecognition());
 
-    // ================= VERIFICACIÓN DE ESCRITURA ACTIVA =================
+    // Verificación de Escritura Activa
     document.getElementById('btn-check-synonym').addEventListener('click', () => this.checkSynonymWriting());
     document.getElementById('btn-check-full-sentence').addEventListener('click', () => this.checkFullSentenceWriting());
 
@@ -222,7 +223,7 @@ class AppController {
     if (this.studyMode === 'grid') {
       this.showGridView();
     } else {
-      this.showSingleWordView();
+      this.showSingleWordView(0);
     }
   }
 
@@ -236,10 +237,9 @@ class AppController {
         <div class="w-title">${wordObj.word}</div>
         <div class="w-es">${wordObj.spanish}</div>
       `;
+      // Al hacer clic en CUALQUIER palabra de la lista, abre esa palabra específica para practicar!
       card.addEventListener('click', () => {
-        this.currentWordIndex = idx;
-        this.loadWord(wordObj);
-        this.showSingleWordView();
+        this.showSingleWordView(idx);
       });
       this.levelWordsContainer.appendChild(card);
     });
@@ -250,7 +250,10 @@ class AppController {
     this.singleWordPracticeView.style.display = 'none';
   }
 
-  showSingleWordView() {
+  showSingleWordView(index) {
+    if (typeof index === 'number') {
+      this.currentWordIndex = index;
+    }
     this.levelGridView.style.display = 'none';
     this.singleWordPracticeView.style.display = 'block';
     this.loadWord(this.filteredWords[this.currentWordIndex]);
@@ -345,6 +348,11 @@ class AppController {
 
       this.setMascot("🎉 ¡EXCELENTE! ¡Deletreo correcto! ¡Ahora intenta escribir su sinónimo u oración!");
       tts.speakSpanish("¡Excelente! Deletreo perfecto en Spanglish.");
+
+      // Si está en modo sucesivo, pasar a la siguiente palabra automáticamente
+      if (this.studyMode === 'sequential') {
+        setTimeout(() => this.nextWord(), 2000);
+      }
     } else {
       for (let s of slots) s.classList.add('error');
       this.setMascot("❌ ¡Casi! Revisa las letras e inténtalo de nuevo.");
@@ -355,7 +363,6 @@ class AppController {
     }
   }
 
-  // ================= VERIFICACIÓN DE ESCRITURA ACTIVA =================
   checkSynonymWriting() {
     const inputVal = document.getElementById('input-synonym-user').value.trim().toLowerCase();
     const fb = document.getElementById('synonym-feedback');
@@ -452,7 +459,6 @@ class AppController {
     }
   }
 
-  // Parent dashboard breakdown
   renderParentLevelProgress() {
     const list = document.getElementById('parent-level-progress-list');
     if (!list) return;
@@ -473,7 +479,6 @@ class AppController {
     }
   }
 
-  // Taller Dedicado de Escritura de Oraciones (Pestaña 4)
   loadStandaloneSentenceWorkshop() {
     const randomIdx = Math.floor(Math.random() * WORDS_DATA.length);
     this.standaloneWordObj = WORDS_DATA[randomIdx];
@@ -502,7 +507,6 @@ class AppController {
     }
   }
 
-  // Modo Concurso
   loadContestMode() {
     const randomIdx = Math.floor(Math.random() * WORDS_DATA.length);
     this.contestWordObj = WORDS_DATA[randomIdx];
@@ -538,7 +542,6 @@ class AppController {
     }
   }
 
-  // Renderizar Diccionario
   renderDictionary() {
     const grid = document.getElementById('dictionary-grid');
     if (!grid) return;
