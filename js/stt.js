@@ -1,5 +1,5 @@
 // Módulo de Reconocimiento de Voz Inteligente Infantil (STT Dual Engine)
-// Optimizado para escuchar deletreo por letra o palabra completa tanto en Inglés como en Español.
+// Optimizado para tolerancia a vocales cortas (ej: "pen" vs "pan"), fonética en español/inglés y voz infantil.
 
 class STTEngine {
   constructor() {
@@ -8,62 +8,63 @@ class STTEngine {
       this.recognition = new SpeechRecognition();
       this.recognition.continuous = false;
       this.recognition.interimResults = false;
-      this.recognition.maxAlternatives = 3; // Capturar múltiples alternativas para mayor precisión
+      this.recognition.maxAlternatives = 5; // Capturar hasta 5 opciones para tolerancia acústica
       this.recognition.lang = 'en-US';
     } else {
       this.recognition = null;
     }
 
-    // Mapa fonético de letras habladas por un niño de 7 años (en Inglés y Español)
+    // Mapa fonético de letras habladas por un niño de 7 años
     this.phoneticLetterMap = {
-      // Fonética en Inglés
-      'ay': 'a', 'ei': 'a', 'hey': 'a',
+      'ay': 'a', 'ei': 'a', 'hey': 'a', 'a': 'a',
       'bee': 'b', 'be': 'b', 'bi': 'b',
-      'cee': 'c', 'see': 'c', 'si': 'c',
-      'dee': 'd', 'di': 'd',
-      'ee': 'e', 'eh': 'e',
-      'ef': 'f', 'eff': 'f',
-      'gee': 'g', 'ji': 'g',
-      'aitch': 'h', 'eich': 'h',
-      'eye': 'i', 'ai': 'i',
-      'jay': 'j', 'jey': 'j',
-      'kay': 'k', 'key': 'k',
-      'el': 'l', 'ell': 'l',
-      : 'm', 'emm': 'm',
-      'en': 'n', 'enn': 'n',
-      'oh': 'o', 'ou': 'o',
-      'pee': 'p', 'pi': 'p',
-      'cue': 'q', 'kiu': 'q',
-      'ar': 'r', 'are': 'r',
-      'ess': 's', 'es': 's',
-      'tee': 't', 'ti': 't',
-      'you': 'u', 'iu': 'u',
-      'vee': 'v', 'vi': 'v',
+      'cee': 'c', 'see': 'c', 'si': 'c', 'ce': 'c',
+      'dee': 'd', 'di': 'd', 'de': 'd',
+      'ee': 'e', 'eh': 'e', 'e': 'e',
+      'ef': 'f', 'eff': 'f', 'efe': 'f',
+      'gee': 'g', 'ji': 'g', 'ge': 'g',
+      'aitch': 'h', 'eich': 'h', 'hache': 'h',
+      'eye': 'i', 'ai': 'i', 'i': 'i',
+      'jay': 'j', 'jey': 'j', 'jota': 'j',
+      'kay': 'k', 'key': 'k', 'ka': 'k',
+      'el': 'l', 'ell': 'l', 'ele': 'l',
+      'em': 'm', 'emm': 'm', 'eme': 'm',
+      'en': 'n', 'enn': 'n', 'ene': 'n',
+      'oh': 'o', 'ou': 'o', 'o': 'o',
+      'pee': 'p', 'pi': 'p', 'pe': 'p',
+      'cue': 'q', 'kiu': 'q', 'cu': 'q',
+      'ar': 'r', 'are': 'r', 'erre': 'r',
+      'ess': 's', 'es': 's', 'ese': 's',
+      'tee': 't', 'ti': 't', 'te': 't',
+      'you': 'u', 'iu': 'u', 'u': 'u',
+      'vee': 'v', 'vi': 'v', 'uve': 'v',
       'double you': 'w', 'doble u': 'w',
-      'ex': 'x', 'eks': 'x',
-      'why': 'y', 'wai': 'y',
-      'zee': 'z', 'zed': 'z', 'zi': 'z',
+      'ex': 'x', 'eks': 'x', 'equis': 'x',
+      'why': 'y', 'wai': 'y', 'ye': 'y',
+      'zee': 'z', 'zed': 'z', 'zi': 'z', 'zeta': 'z'
+    };
 
-      // Fonética en Español (para niños hispanohablantes deletreando)
-      'a': 'a',
-      'ce': 'c',
-      'de': 'd',
-      'efe': 'f',
-      'ge': 'g',
-      'hache': 'h',
-      'jota': 'j',
-      'ka': 'k',
-      'ele': 'l',
-      'eme': 'm',
-      'ene': 'n',
-      'pe': 'p',
-      'cu': 'q',
-      'erre': 'r',
-      'te': 't',
-      'uve': 'v',
-      'equis': 'x',
-      'ye': 'y',
-      'zeta': 'z'
+    // Pares comunes de confusión acústica de vocales (Short Vowel Confusion Pairs)
+    // En inglés americano, la 'E' corta (pen) y la 'A' o 'I' corta (pan/pin) suenan idénticas a los motores STT.
+    this.commonVowelConfusions = {
+      'pen': ['pan', 'pin', 'pain', 'peen'],
+      'pet': ['pat', 'pit', 'pete'],
+      'bed': ['bad', 'bid'],
+      'men': ['man', 'min'],
+      'red': ['rad', 'read'],
+      'ten': ['tan', 'tin'],
+      'leg': ['lag', 'lig'],
+      'net': ['nat', 'nit'],
+      'vet': ['vat', 'vit'],
+      'wet': ['wat', 'wit'],
+      'hen': ['han', 'hin'],
+      'hat': ['hut', 'hot'],
+      'cap': ['cup', 'cop'],
+      'pig': ['peg', 'puk'],
+      'bag': ['bug', 'beg'],
+      'cat': ['cut', 'cot'],
+      'rat': ['rut', 'rot'],
+      'sad': ['sid', 'sod']
     };
   }
 
@@ -78,7 +79,6 @@ class STTEngine {
     }
 
     this.recognition.onresult = (event) => {
-      // Recopilar todas las alternativas posibles reconocidas
       const alternatives = [];
       for (let i = 0; i < event.results[0].length; i++) {
         alternatives.push(event.results[0][i].transcript.toLowerCase().trim());
@@ -115,23 +115,49 @@ class STTEngine {
     }
   }
 
-  // Evaluador Fonético Robusto para Niños
+  // Evaluador Fonético Inteligente con Tolerancia a Confusión de Vocales
   evaluateMatch(transcript, targetWord, alternatives = []) {
     const target = targetWord.toLowerCase().trim();
     const cleanTarget = target.replace(/[^a-z0-9]/g, '');
 
-    // Comprobar todas las alternativas entregadas por el reconocedor
     const allTranscripts = [transcript, ...alternatives];
+
+    // Lista de palabras acústicamente equivalentes según el diccionario de confusión
+    const knownConfusions = this.commonVowelConfusions[cleanTarget] || [];
 
     for (let t of allTranscripts) {
       const spokenClean = t.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-      // 1. Coincidencia directa de la palabra pronunciada (ej: "pen" === "pen")
+      // 1. Coincidencia directa (ej: "pen" === "pen")
       if (spokenClean === cleanTarget) {
         return { match: true, score: 100 };
       }
 
-      // 2. Coincidencia por conversión fonética de letras individuales
+      // 2. Coincidencia por Tolerancia Fonética de Vocales (ej: Target "pen", STT escuchó "pan")
+      if (knownConfusions.includes(spokenClean)) {
+        return { match: true, score: 95, note: "Ajuste acústico de vocal superado" };
+      }
+
+      // 3. Tolerancia por substitución de 1 sola vocal (si difieren únicamente en 1 vocal corta E/A/I)
+      if (spokenClean.length === cleanTarget.length && cleanTarget.length >= 3) {
+        let diffCount = 0;
+        let diffIsVowel = false;
+
+        for (let i = 0; i < cleanTarget.length; i++) {
+          if (spokenClean[i] !== cleanTarget[i]) {
+            diffCount++;
+            if (/[aeiou]/.test(spokenClean[i]) && /[aeiou]/.test(cleanTarget[i])) {
+              diffIsVowel = true;
+            }
+          }
+        }
+
+        if (diffCount === 1 && diffIsVowel) {
+          return { match: true, score: 90, note: "Tolerancia de vocal corta aplicada" };
+        }
+      }
+
+      // 4. Coincidencia por conversión fonética de letras (ej: "P - E - N" -> p-e-n)
       const tokens = t.toLowerCase().split(/[\s\-]+/);
       let convertedLetters = '';
       tokens.forEach(tok => {
@@ -144,17 +170,6 @@ class STTEngine {
 
       if (convertedLetters === cleanTarget) {
         return { match: true, score: 100 };
-      }
-
-      // 3. Similitud aproximada si el niño omitió solo 1 letra o tuvo pequeña imprecisión
-      if (cleanTarget.length >= 3) {
-        const distWord = this.levenshteinDistance(spokenClean, cleanTarget);
-        if (distWord <= 1) return { match: true, score: 90 };
-
-        if (convertedLetters.length > 0) {
-          const distLetters = this.levenshteinDistance(convertedLetters, cleanTarget);
-          if (distLetters <= 1) return { match: true, score: 90 };
-        }
       }
     }
 
